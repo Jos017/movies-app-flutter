@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movies_app_flutter/themes/main_theme.dart';
+import 'package:movies_app_flutter/widgets/widgets.dart';
 
 class DetailsScreen extends StatelessWidget {
   const DetailsScreen({super.key});
@@ -17,6 +18,10 @@ class DetailsScreen extends StatelessWidget {
           SliverList(
             delegate: SliverChildListDelegate([
               _PosterAndTitle(),
+              _Overview(),
+              _Overview(),
+              _Overview(),
+              const CastingCards()
             ]),
           )
         ],
@@ -39,6 +44,7 @@ class _CustomAppBar extends StatelessWidget {
         title: Container(
           width: double.infinity,
           alignment: Alignment.bottomCenter,
+          padding: const EdgeInsets.only(bottom: 10),
           color: Colors.black12,
           child: const Text(
             'movie.title',
@@ -102,6 +108,22 @@ class _PosterAndTitle extends StatelessWidget {
           ],
         )
       ]),
+    );
+  }
+}
+
+class _Overview extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+      child: Text(
+        'Minim occaecat pariatur et aliqua. Elit voluptate dolore ad reprehenderit aliquip aliquip labore commodo commodo. Non proident nulla laboris enim adipisicing nisi. Minim occaecat pariatur et aliqua. Elit voluptate dolore ad reprehenderit aliquip aliquip labore commodo commodo. Non proident nulla laboris enim adipisicing nisi.',
+        textAlign: TextAlign.justify,
+        style: textTheme.titleMedium,
+      ),
     );
   }
 }
