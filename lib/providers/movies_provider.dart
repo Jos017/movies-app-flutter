@@ -8,6 +8,7 @@ class MoviesProvider extends ChangeNotifier {
   final String _apiKey = dotenv.env['TMDB_KEY'] ?? '';
   final String _baseUrl = dotenv.env['TMDB_BASE_URL'] ?? '';
   final String _language = 'es-ES';
+  int _popularPage = 0;
 
   List<Movie> nowPlayingMovies = [];
   List<Movie> popularMovies = [];
@@ -18,31 +19,33 @@ class MoviesProvider extends ChangeNotifier {
     getPopularMovies();
   }
 
-  getNowPlayingMovies() async {
+  Future<String> _getRawJsonData(String endpoint, [page = 1]) async {
     Map<String, dynamic> queryParams = {
       'api_key': _apiKey,
       'language': _language,
-      'page': '1',
+      'page': '$page',
     };
 
-    final url = Uri.https(_baseUrl, '3/movie/now_playing', queryParams);
+    final url = Uri.https(_baseUrl, endpoint, queryParams);
     final response = await http.get(url);
-    final nowPlayingResponse = NowPlayingResponse.fromRawJson(response.body);
+
+    return response.body;
+  }
+
+  getNowPlayingMovies() async {
+    final rawJsonData = await _getRawJsonData('3/movie/now_playing');
+    final nowPlayingResponse = NowPlayingResponse.fromRawJson(rawJsonData);
 
     nowPlayingMovies = nowPlayingResponse.results;
     notifyListeners();
   }
 
   getPopularMovies() async {
-    Map<String, dynamic> queryParams = {
-      'api_key': _apiKey,
-      'language': _language,
-      'page': '1',
-    };
+    _popularPage += 1;
 
-    final url = Uri.https(_baseUrl, '3/movie/popular', queryParams);
-    final response = await http.get(url);
-    final popularResponse = PopularResponse.fromRawJson(response.body);
+    final rawJsonData =
+        await _getRawJsonData('3/movie/now_playing', _popularPage);
+    final popularResponse = PopularResponse.fromRawJson(rawJsonData);
 
     popularMovies = [...popularMovies, ...popularResponse.results];
     print(popularMovies[0]);
