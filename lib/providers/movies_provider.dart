@@ -7,7 +7,7 @@ import 'package:movies_app_flutter/models/popular_response.dart';
 class MoviesProvider extends ChangeNotifier {
   final String _apiKey = dotenv.env['TMDB_KEY'] ?? '';
   final String _baseUrl = dotenv.env['TMDB_BASE_URL'] ?? '';
-  final String _language = 'es-ES';
+  final String _language = 'en-US';
   int _popularPage = 0;
 
   List<Movie> nowPlayingMovies = [];

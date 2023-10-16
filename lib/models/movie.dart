@@ -44,6 +44,15 @@ class Movie {
         : defaultImageUrl;
   }
 
+  get fullBackdropImg {
+    final imgBaseUrl = dotenv.env['TMDB_IMG_URL'] ?? '';
+    final defaultImageUrl = dotenv.env['DEFAULT_POSTER_IMG_URL'] ?? '';
+
+    return backdropPath != null
+        ? '$imgBaseUrl/t/p/w500$backdropPath'
+        : defaultImageUrl;
+  }
+
   factory Movie.fromRawJson(String str) => Movie.fromJson(json.decode(str));
 
   factory Movie.fromJson(Map<String, dynamic> json) => Movie(
