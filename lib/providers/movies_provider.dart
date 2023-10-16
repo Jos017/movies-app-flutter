@@ -8,12 +8,14 @@ class MoviesProvider extends ChangeNotifier {
   final String _baseUrl = dotenv.env['TMDB_BASE_URL'] ?? '';
   final String _language = 'es-ES';
 
+  List<Movie> nowPlayingMovies = [];
+
   MoviesProvider() {
     print('MoviesProvider Initialized');
-    getOnDisplayMovies();
+    getNowPlayingMovies();
   }
 
-  getOnDisplayMovies() async {
+  getNowPlayingMovies() async {
     print('getOnDisplayMovies');
 
     Map<String, dynamic> queryParams = {
@@ -28,5 +30,8 @@ class MoviesProvider extends ChangeNotifier {
 
     print('Response status: ${response.statusCode}');
     print('Response body: ${nowPlayingResponse.results[0].title}');
+    nowPlayingMovies = nowPlayingResponse.results;
+
+    notifyListeners();
   }
 }
