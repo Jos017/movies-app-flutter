@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:movies_app_flutter/models/models.dart';
-import 'package:movies_app_flutter/models/popular_response.dart';
 
 class MoviesProvider extends ChangeNotifier {
   final String _apiKey = dotenv.env['TMDB_KEY'] ?? '';
@@ -12,6 +11,7 @@ class MoviesProvider extends ChangeNotifier {
 
   List<Movie> nowPlayingMovies = [];
   List<Movie> popularMovies = [];
+  Map<int, List<Cast>> moviesCast = {};
 
   MoviesProvider() {
     print('MoviesProvider Initialized');
@@ -48,7 +48,15 @@ class MoviesProvider extends ChangeNotifier {
     final popularResponse = PopularResponse.fromRawJson(rawJsonData);
 
     popularMovies = [...popularMovies, ...popularResponse.results];
-    print(popularMovies[0]);
     notifyListeners();
+  }
+
+  Future<List<Cast>> getMovieCast(int movieId) async {
+    final rawJsonData = await _getRawJsonData('3/movie/$movieId/credits');
+    final creditsResponse = CreditsResponse.fromRawJson(rawJsonData);
+
+    moviesCast[movieId] = creditsResponse.cast;
+
+    return creditsResponse.cast;
   }
 }
