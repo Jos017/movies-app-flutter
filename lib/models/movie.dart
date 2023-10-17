@@ -6,6 +6,7 @@ class Movie {
   bool adult;
   String? backdropPath;
   List<int> genreIds;
+  String? heroId;
   int id;
   String originalLanguage;
   String originalTitle;
