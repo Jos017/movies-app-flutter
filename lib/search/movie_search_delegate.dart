@@ -71,7 +71,22 @@ class MovieSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    return const Text('buildResults');
+    if (query.isEmpty) return _EmptyContainer();
+
+    final moviesProvider = Provider.of<MoviesProvider>(context, listen: false);
+    return FutureBuilder(
+      future: moviesProvider.searchMovies(query),
+      builder: (_, AsyncSnapshot<List<Movie>> snapshot) {
+        if (!snapshot.hasData) return _EmptyContainer();
+
+        final movies = snapshot.data!;
+
+        return ListView.builder(
+          itemCount: movies.length,
+          itemBuilder: (_, int index) => _MovieItem(movie: movies[index]),
+        );
+      },
+    );
   }
 
   @override
