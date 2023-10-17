@@ -1,17 +1,27 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:movies_app_flutter/helpers/debouncer.dart';
 import 'package:movies_app_flutter/models/models.dart';
 
 class MoviesProvider extends ChangeNotifier {
   final String _apiKey = dotenv.env['TMDB_KEY'] ?? '';
   final String _baseUrl = dotenv.env['TMDB_BASE_URL'] ?? '';
   final String _language = 'en-US';
-  int _popularPage = 0;
+  final StreamController<List<Movie>> _suggestionStreamController =
+      StreamController.broadcast();
+  final Debouncer debouncer =
+      Debouncer(duration: const Duration(milliseconds: 500));
 
+  int _popularPage = 0;
   List<Movie> nowPlayingMovies = [];
   List<Movie> popularMovies = [];
   Map<int, List<Cast>> moviesCast = {};
+
+  Stream<List<Movie>> get suggestionStream =>
+      _suggestionStreamController.stream;
 
   MoviesProvider() {
     getNowPlayingMovies();
@@ -75,5 +85,20 @@ class MoviesProvider extends ChangeNotifier {
     final searchResponse = MovieSearchResponse.fromRawJson(response.body);
 
     return searchResponse.results;
+  }
+
+  void getSuggestionsByQuery(String searchTerm) {
+    debouncer.value = '';
+    debouncer.onValue = (value) async {
+      final results = await searchMovies(value);
+      _suggestionStreamController.add(results);
+    };
+
+    final timer = Timer.periodic(const Duration(milliseconds: 300), (_) {
+      debouncer.value = searchTerm;
+    });
+
+    Future.delayed(const Duration(milliseconds: 301))
+        .then((_) => timer.cancel());
   }
 }
